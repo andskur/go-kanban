@@ -9,7 +9,8 @@ import (
 
 // Config represent application configuration vars
 type Config struct {
-	BaseUrl      string
+	Host         string
+	Port         string
 	AccessToken  string
 	Account      string
 	Repositories []string
@@ -23,7 +24,8 @@ func InitConfig() *Config {
 	_ = godotenv.Load()
 
 	return &Config{
-		BaseUrl:      os.Getenv("BASE_URL"),
+		Host:         os.Getenv("APP_HOST"),
+		Port:         os.Getenv("APP_PORT"),
 		AccessToken:  os.Getenv("GH_ACCESS_TOKEN"),
 		Account:      os.Getenv("GH_ACCOUNT"),
 		Repositories: divide(os.Getenv("GH_REPOSITORIES")),

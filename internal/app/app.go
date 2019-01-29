@@ -12,9 +12,9 @@ type Application struct {
 }
 
 // NewApplication create new application instance
-func NewApplication() (*Application, error) {
+func NewApplication(cfg *config.Config) (*Application, error) {
 	app := &Application{
-		Config: config.InitConfig(),
+		Config: cfg,
 	}
 	err := app.FetchBoard()
 	if err != nil {
