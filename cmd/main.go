@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/andskur/kanban-board/internal/app"
 )
 
@@ -18,7 +16,6 @@ func main() {
 	}
 
 	board := app.Board
-	spew.Dump(board)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 

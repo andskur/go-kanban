@@ -31,7 +31,9 @@ func NewIssue(rawIssue *github.Issue) *Issue {
 		Closed: rawIssue.ClosedAt,
 	}
 	issue.SetState(*rawIssue.State, rawIssue.Assignee)
-	issue.SetAssignee(rawIssue.User)
+	if rawIssue.Assignee != nil {
+		issue.SetAssignee(rawIssue.Assignee)
+	}
 	return issue
 }
 
