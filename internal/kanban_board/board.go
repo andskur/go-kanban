@@ -2,6 +2,7 @@ package kanban
 
 import (
 	"context"
+	"sort"
 
 	"github.com/andskur/kanban-board/config"
 	"github.com/andskur/kanban-board/internal/services/github_api"
@@ -58,5 +59,8 @@ func (board *Board) GetMilestones() error {
 		}
 
 	}
+	sort.Slice(board.Milestones, func(i, j int) bool {
+		return board.Milestones[i].Title < board.Milestones[j].Title
+	})
 	return nil
 }
