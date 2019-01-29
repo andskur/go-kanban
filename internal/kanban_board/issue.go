@@ -27,7 +27,7 @@ func NewIssue(rawIssue *github.Issue) *Issue {
 	issue := &Issue{
 		Id:     *rawIssue.ID,
 		Title:  *rawIssue.Title,
-		Url:    *rawIssue.URL,
+		Url:    *rawIssue.HTMLURL,
 		Closed: rawIssue.ClosedAt,
 	}
 	issue.SetState(*rawIssue.State, rawIssue.Assignee)

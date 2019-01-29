@@ -16,7 +16,7 @@ func NewApplication() (*Application, error) {
 	app := &Application{
 		Config: config.InitConfig(),
 	}
-	err := app.initBoard()
+	err := app.FetchBoard()
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +24,8 @@ func NewApplication() (*Application, error) {
 	return app, nil
 }
 
-// initBoard init Kanban board for current application
-func (app *Application) initBoard() error {
+// FetchBoard fetch data for Kanban board for current application
+func (app *Application) FetchBoard() error {
 	board, err := kanban.NewBoard(app.Config)
 	if err != nil {
 		return err

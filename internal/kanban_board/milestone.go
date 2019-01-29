@@ -37,7 +37,7 @@ func NewMilestone(ctx *context.Context, rawMs *github.Milestone, owner, repo str
 	ms := &Milestone{
 		Id:    *rawMs.Number,
 		Title: *rawMs.Title,
-		Url:   *rawMs.URL,
+		Url:   *rawMs.HTMLURL,
 	}
 
 	ms.GetProgress(float64(*rawMs.ClosedIssues), float64(*rawMs.OpenIssues))
