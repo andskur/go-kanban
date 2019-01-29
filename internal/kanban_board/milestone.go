@@ -21,8 +21,8 @@ type Milestone struct {
 type Progress struct {
 	Total     int
 	Complete  int
-	remaining int
-	percent   int
+	Remaining int
+	Percent   int
 }
 
 // Progress represent issues of given milestone
