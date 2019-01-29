@@ -2,8 +2,6 @@ package kanban
 
 import (
 	"context"
-	"sort"
-
 	"github.com/andskur/kanban-board/config"
 	"github.com/andskur/kanban-board/internal/services/github_api"
 )
@@ -19,7 +17,7 @@ var (
 type Board struct {
 	Owner        string
 	Repositories []string
-	Milestones   []*Milestone
+	Milestones   chan []*Milestone
 }
 
 // NewBoard create new Board structure
@@ -44,8 +42,11 @@ func (board *Board) GetMilestones() error {
 	ctx := context.Background()
 	client.Authenticate(ctx, token)
 
+	c := make(chan []*Milestone)
 	for _, repo := range board.Repositories {
-		milestones, err := client.FetchMilestones(ctx, board.Owner, repo)
+		go board.FetchData(c, ctx, repo)
+
+		/*milestones, err := client.FetchMilestones(ctx, board.Owner, repo)
 		if err != nil {
 			return err
 		}
@@ -56,11 +57,30 @@ func (board *Board) GetMilestones() error {
 				return err
 			}
 			board.Milestones = append(board.Milestones, ms)
-		}
-
+		}*/
+		board.Milestones = c
 	}
-	sort.Slice(board.Milestones, func(i, j int) bool {
+	/*sort.Slice(board.Milestones, func(i, j int) bool {
 		return board.Milestones[i].Title < board.Milestones[j].Title
-	})
+	})*/
+	return nil
+}
+
+func (board *Board) FetchData(data chan []*Milestone, ctx context.Context, repo string) error {
+	var mss []*Milestone
+	milestones, err := client.FetchMilestones(ctx, board.Owner, repo)
+	if err != nil {
+		return err
+	}
+	for _, v := range milestones {
+		ms, err := NewMilestone(&ctx, v, board.Owner, repo)
+		if err != nil {
+			return err
+		}
+		mss = append(mss, ms)
+	}
+
+	data <- mss
+
 	return nil
 }
