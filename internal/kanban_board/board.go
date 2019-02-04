@@ -55,31 +55,43 @@ func (board *Board) CreateBoard() error {
 
 	// first, fetch milestones for each repository
 	for _, repo := range board.Repositories {
-		milestones, err := client.FetchMilestones(ctx, board.Owner, repo)
-		if err != nil {
-			return err
-		}
-
-		// next, format each milestone and fetch its issues
-		for _, v := range milestones {
-			wg.Add(1)
-			go board.PrepareMilestones(&wg, ctx, v, repo)
-		}
-
-		// waiting data from all milestones
-		wg.Wait()
+		wg.Add(1)
+		go board.FetchMilestones(&wg, ctx, repo)
 	}
+	// waiting data from all repositories
+	wg.Wait()
 	return nil
 }
 
-// PrepareMilestones async format given milestones and fetch its issues
-func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, rawmS *github.Milestone, repo string) {
+func (board *Board) FetchMilestones(wg *sync.WaitGroup, ctx context.Context, repo string) {
 	defer wg.Done()
 
-	fmt.Printf("Start fetching for %s milestone\n", rawmS.GetTitle())
-	milestone, err := NewMilestone(&ctx, rawmS, board.Owner, repo)
+	// first, fetch milestones for each repository
+	milestones, err := client.FetchMilestones(ctx, board.Owner, repo)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	}
+
+	var wgSub sync.WaitGroup
+
+	//next,  format each milestone and fetch its issues
+	for _, v := range milestones {
+		wgSub.Add(1)
+		go board.PrepareMilestones(&wgSub, ctx, v, repo)
+	}
+
+	// waiting data from all milestones
+	wgSub.Wait()
+}
+
+// PrepareMilestones async format given milestones and fetch its issues
+func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, ms *github.Milestone, repo string) {
+	defer wg.Done()
+
+	fmt.Printf("Start fetching for %s milestone\n", ms.GetTitle())
+	milestone, err := NewMilestone(&ctx, ms, board.Owner, repo)
+	if err != nil {
+		log.Println(err)
 	}
 
 	board.Milestones = append(board.Milestones, milestone)
