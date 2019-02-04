@@ -64,9 +64,11 @@
                 <div class="col-sm-4">
                     <div class="list-group">
                         {{range .Active}}
-                        <a href="{{.Url}}" target="_blank" class="list-group-item list-group-item-info">
+                        <a href="{{.Url}}" target="_blank" class="list-group-item {{ if .Paused }} list-group-item-warning {{else}} list-group-item-info {{end}}">
                             <img class="img-rounded" src="{{.AvatarUrl}}" width="16" height="16" border="0"/>
-                            <em>{{.Title}}</em>
+                            {{ if .Paused }} <em> {{end}}
+                                {{.Title}}
+                            {{ if .Paused }} </em> {{end}}
                             <span id="state" class="glyphicon"></span>
                             <span style="float: right" class="glyphicon glyphicon-new-window"/>
                         </a>

@@ -2,6 +2,7 @@ package kanban
 
 import (
 	"fmt"
+	"github.com/andskur/kanban-board/internal/utils"
 	"time"
 
 	"github.com/google/go-github/v21/github"
@@ -13,6 +14,7 @@ type Issue struct {
 	State  string
 	Title  string
 	Url    string
+	Paused bool
 	Closed *time.Time
 	Assignee
 }
@@ -23,7 +25,7 @@ type Assignee struct {
 }
 
 // NewIssue create new Issue structure
-func NewIssue(rawIssue *github.Issue) *Issue {
+func NewIssue(rawIssue *github.Issue, pausedLabels []string) *Issue {
 	issue := &Issue{
 		Id:     *rawIssue.ID,
 		Title:  *rawIssue.Title,
@@ -31,9 +33,15 @@ func NewIssue(rawIssue *github.Issue) *Issue {
 		Closed: rawIssue.ClosedAt,
 	}
 	issue.SetState(*rawIssue.State, rawIssue.Assignee)
+
 	if rawIssue.Assignee != nil {
 		issue.SetAssignee(rawIssue.Assignee)
 	}
+
+	if len(rawIssue.Labels) > 0 {
+		issue.IsPaused(rawIssue.Labels, pausedLabels)
+	}
+
 	return issue
 }
 
@@ -54,4 +62,12 @@ func (ii *Issue) SetAssignee(user *github.User) {
 	avatar := fmt.Sprintf("%s?s=16", *user.AvatarURL)
 	assignee := Assignee{avatar}
 	ii.Assignee = assignee
+}
+
+func (ii *Issue) IsPaused(allLabels []github.Label, pausedLabels []string) {
+	for _, v := range allLabels {
+		if utils.ContainSlice(pausedLabels, *v.Name) {
+			ii.Paused = true
+		}
+	}
 }

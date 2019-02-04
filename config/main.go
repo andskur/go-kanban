@@ -1,10 +1,9 @@
 package config
 
 import (
-	"os"
-	"strings"
-
+	"github.com/andskur/kanban-board/internal/utils"
 	"github.com/joho/godotenv"
+	"os"
 )
 
 // Config represent application configuration vars
@@ -28,12 +27,7 @@ func InitConfig() *Config {
 		Port:         os.Getenv("APP_PORT"),
 		AccessToken:  os.Getenv("GH_ACCESS_TOKEN"),
 		Account:      os.Getenv("GH_ACCOUNT"),
-		Repositories: divide(os.Getenv("GH_REPOSITORIES")),
-		PausedLabels: divide(os.Getenv("PAUSED_LABELS")),
+		Repositories: utils.Divide(os.Getenv("GH_REPOSITORIES")),
+		PausedLabels: utils.Divide(os.Getenv("PAUSED_LABELS")),
 	}
-}
-
-// divide divides given string
-func divide(str string) []string {
-	return strings.Split(str, "|")
 }

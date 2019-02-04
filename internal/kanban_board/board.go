@@ -25,6 +25,7 @@ type Board struct {
 	Owner        string
 	Repositories []string
 	Milestones   []*Milestone
+	PausedLabels []string
 }
 
 // NewBoard create new Board structure
@@ -34,6 +35,7 @@ func NewBoard(config *config.Config) (*Board, error) {
 	board := &Board{
 		Owner:        config.Account,
 		Repositories: config.Repositories,
+		PausedLabels: config.PausedLabels,
 	}
 
 	err := board.CreateBoard()
@@ -89,7 +91,7 @@ func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, m
 	defer wg.Done()
 
 	fmt.Printf("Start fetching for %s milestone\n", ms.GetTitle())
-	milestone, err := NewMilestone(&ctx, ms, board.Owner, repo)
+	milestone, err := NewMilestone(&ctx, ms, board.Owner, repo, board.PausedLabels)
 	if err != nil {
 		log.Println(err)
 	}
