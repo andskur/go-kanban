@@ -1,14 +1,20 @@
 package app
 
 import (
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+
 	"github.com/andskur/kanban-board/config"
-	"github.com/andskur/kanban-board/internal/kanban_board"
+	"github.com/andskur/kanban-board/internal/server"
 )
 
 // Application represent application structure
 type Application struct {
 	*config.Config
-	Board kanban.Board
 }
 
 // NewApplication create new application instance
@@ -16,21 +22,25 @@ func NewApplication(cfg *config.Config) (*Application, error) {
 	app := &Application{
 		Config: cfg,
 	}
-	err := app.FetchBoard()
-	if err != nil {
-		return nil, err
-	}
 
 	return app, nil
 }
 
-// FetchBoard fetch data for Kanban board for current application
-func (app *Application) FetchBoard() error {
-	board, err := kanban.NewBoard(app.Config)
-	if err != nil {
-		return err
-	}
+// StartServer start http web server
+func (app *Application) StartServer() {
+	// register handler
+	http.HandleFunc("/", server.BoardHandler(app.Config))
 
-	app.Board = *board
-	return nil
+	addr := strings.Join([]string{app.Host, app.Port}, ":")
+	// Listen connections
+	go func() {
+		log.Printf("listen and serve on %s\n", addr)
+		http.ListenAndServe(addr, nil)
+	}()
+
+	// Gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
+	<-quit
+	log.Println("Shutdown Server ...")
 }

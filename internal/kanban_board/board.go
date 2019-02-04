@@ -2,10 +2,10 @@ package kanban
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/google/go-github/v21/github"
 
@@ -67,6 +67,7 @@ func (board *Board) CreateBoard() error {
 	return nil
 }
 
+// FetchMilestones fetch milestones data for given repository
 func (board *Board) FetchMilestones(wg *sync.WaitGroup, ctx context.Context, repo string) {
 	defer wg.Done()
 
@@ -92,7 +93,8 @@ func (board *Board) FetchMilestones(wg *sync.WaitGroup, ctx context.Context, rep
 func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, ms *github.Milestone, repo string) {
 	defer wg.Done()
 
-	fmt.Printf("Start fetching for %s milestone\n", ms.GetTitle())
+	start := time.Now()
+	log.Printf("Start fetching issues for %s milestone\n", ms.GetTitle())
 	milestone, err := NewMilestone(&ctx, ms, board.Owner, repo, board.PausedLabels)
 	if err != nil {
 		log.Println(err)
@@ -103,7 +105,8 @@ func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, m
 	mutex.Unlock()
 
 	issuesCount := len(milestone.Issues.Queued) + len(milestone.Issues.Completed) + len(milestone.Issues.Active)
-	fmt.Printf("Finish fetching %d issues for %s milestone\n", issuesCount, milestone.Title)
+	diff := time.Now().Sub(start)
+	log.Printf("Finish fetching %d issues for %s mileston in %s \n", issuesCount, milestone.Title, diff)
 }
 
 // SortMilestones sort board milestones in alphabet order by its Title
