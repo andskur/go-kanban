@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/andskur/kanban-board/config"
-	"github.com/andskur/kanban-board/internal/kanban_board"
+	"github.com/andskur/kanban-board/internal/services/kanban_board"
 )
 
 // BoardHandler handling main request to server and response as a html Kanban Board
