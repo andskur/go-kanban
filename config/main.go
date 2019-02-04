@@ -1,9 +1,11 @@
 package config
 
 import (
-	"github.com/andskur/kanban-board/internal/utils"
-	"github.com/joho/godotenv"
 	"os"
+
+	"github.com/joho/godotenv"
+
+	"github.com/andskur/kanban-board/internal/utils"
 )
 
 // Config represent application configuration vars

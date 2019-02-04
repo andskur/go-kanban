@@ -28,6 +28,8 @@ type Board struct {
 	PausedLabels []string
 }
 
+var mutex sync.Mutex
+
 // NewBoard create new Board structure
 func NewBoard(config *config.Config) (*Board, error) {
 	token = config.AccessToken
@@ -96,7 +98,10 @@ func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, m
 		log.Println(err)
 	}
 
+	mutex.Lock()
 	board.Milestones = append(board.Milestones, milestone)
+	mutex.Unlock()
+
 	issuesCount := len(milestone.Issues.Queued) + len(milestone.Issues.Completed) + len(milestone.Issues.Active)
 	fmt.Printf("Finish fetching %d issues for %s milestone\n", issuesCount, milestone.Title)
 }
