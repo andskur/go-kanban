@@ -1,4 +1,4 @@
-package application
+package app
 
 import (
 	"github.com/andskur/kanban-board/config"
