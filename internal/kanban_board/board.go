@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sort"
 	"sync"
 
 	"github.com/google/go-github/v21/github"
@@ -82,4 +83,11 @@ func (board *Board) PrepareMilestones(wg *sync.WaitGroup, ctx context.Context, r
 	board.Milestones = append(board.Milestones, milestone)
 	issuesCount := len(milestone.Issues.Queued) + len(milestone.Issues.Completed) + len(milestone.Issues.Active)
 	fmt.Printf("Finish fetching %d issues for %s milestone\n", issuesCount, milestone.Title)
+}
+
+// SortMilestones sort board milestones in alphabet order by its Title
+func (board *Board) SortMilestones() {
+	sort.Slice(board.Milestones, func(i, j int) bool {
+		return board.Milestones[i].Title < board.Milestones[j].Title
+	})
 }
