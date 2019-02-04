@@ -41,6 +41,8 @@ func NewBoard(config *config.Config) (*Board, error) {
 		return nil, err
 	}
 
+	board.SortMilestones()
+
 	return board, nil
 }
 

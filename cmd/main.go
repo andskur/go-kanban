@@ -21,7 +21,9 @@ func main() {
 			log.Fatal(err)
 		}
 		tmpl, _ := template.ParseFiles("views/index.html")
-		tmpl.Execute(w, app.Board)
+		if err := tmpl.Execute(w, app.Board); err != nil {
+			log.Fatal(err)
+		}
 	})
 	addr := strings.Join([]string{conf.Host, conf.Port}, ":")
 
