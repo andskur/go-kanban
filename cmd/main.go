@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"github.com/andskur/kanban-board/config"
+	"github.com/andskur/kanban-board/internal/app"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
-
-	"github.com/andskur/kanban-board/config"
-	"github.com/andskur/kanban-board/internal/app"
+	"syscall"
 )
 
 func main() {
@@ -22,8 +23,15 @@ func main() {
 		tmpl.Execute(w, app.Board)
 	})
 	addr := strings.Join([]string{config.Host, config.Port}, ":")
-	fmt.Println(addr)
 
-	fmt.Println("Server is listening...")
-	http.ListenAndServe(addr, nil)
+	go func() {
+		log.Printf("listen and serve on %s\n", addr)
+		http.ListenAndServe(addr, nil)
+	}()
+
+	// Gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
+	<-quit
+	log.Println("Shutdown Server ...")
 }
